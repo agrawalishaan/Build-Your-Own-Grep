@@ -1,60 +1,5 @@
-const print = require("../util/printer");
-
-const PATTERN_DIGIT = "\\d";
-const PATTERN_ALPHANUMERIC = "\\w";
-
-// const ASCII_RANGES = {
-//   digitStrings: [48, 57],
-//   alphaLower: [97, 122],
-//   alphaUpper: [65, 90],
-//   underscore: [95, 95],
-// };
-
-const ALPHANUMERIC_RANGES = {
-  digitStrings: [48, 57],
-  alphaLower: [97, 122],
-  alphaUpper: [65, 90],
-  underscore: [95, 95],
-};
-
-print();
-
-function matchDigit(char) {
-  const code = char.charCodeAt(0);
-  return (
-    code >= ALPHANUMERIC_RANGES.digitStrings[0] &&
-    code <= ALPHANUMERIC_RANGES.digitStrings[1]
-  );
-}
-
-function matchAlphanumeric(char) {
-  const code = char.charCodeAt(0);
-  for (const key in ALPHANUMERIC_RANGES) {
-    const range = ALPHANUMERIC_RANGES[key];
-    if (code >= range[0] && code <= range[1]) {
-      return true;
-    }
-  }
-  return false;
-}
-
-function matchGroup(char, group) {
-  const positive = group[1] !== "^";
-  let k = positive ? 1 : 2;
-  const patternChars = new Set();
-  for (; k < group.length - 1; k++) {
-    patternChars.add(group[k]);
-    if (patternChars.has(char)) {
-      if (positive) {
-        return true;
-      }
-    }
-  }
-  if (!positive && !patternChars.has(char)) {
-    return true;
-  }
-  return false;
-}
+const { matchDigit, matchAlphanumeric, matchGroup } = require("../match/match");
+const constants = require("../constants/constants");
 
 function main() {
   const input = require("fs").readFileSync(0, "utf-8").trim();
@@ -67,8 +12,11 @@ function main() {
     .map(() => new Array(pattern.length).fill(null));
 
   // capture the input and pattern in a closure
-  function match(i, j) {
-    // base case, no pattern left to match
+  function match(i, j, mustMatchStart) {
+    console.log(
+      `match called with i=${i}, j=${j}, mustMatchStart=${mustMatchStart}`
+    );
+    // base cases, no pattern left to match
     if (j === pattern.length) {
       return true;
     }
@@ -84,64 +32,79 @@ function main() {
 
     let result;
 
+    // ******************** MATCHES ********************
+
     // match a digit
-    if (pattern.slice(j, j + 2) === PATTERN_DIGIT) {
-      result = matchDigit(input[i]) ? match(i + 1, j + 2) : match(i + 1, j);
+    if (pattern.slice(j, j + 2) === constants.PATTERN_DIGIT) {
+      console.log(`must match digit`);
+      const doesMatch = matchDigit(input[i]);
+      if (mustMatchStart) {
+        if (doesMatch) {
+          result = match(i + 1, j + 2, true);
+        } else {
+          result = false;
+        }
+      } else {
+        result = doesMatch ? match(i + 1, j + 2) : match(i + 1, j);
+      }
     }
 
     // match alphanumeric
-    else if (pattern.slice(j, j + 2) === PATTERN_ALPHANUMERIC) {
-      result = matchAlphanumeric(input[i])
-        ? match(i + 1, j + 2)
-        : match(i + 1, j);
+    else if (pattern.slice(j, j + 2) === constants.PATTERN_ALPHANUMERIC) {
+      console.log(`must match alphanumeric`);
+      const doesMatch = matchAlphanumeric(input[i]);
+      if (mustMatchStart) {
+        if (doesMatch) {
+          result = match(i + 1, j + 2, true);
+        } else {
+          result = false;
+        }
+      } else {
+        result = doesMatch ? match(i + 1, j + 2) : match(i + 1, j);
+      }
     }
 
     // match group
     else if (pattern[i] === "[") {
+      console.log(`must match group`);
       // find group
-      let closingBracketFound = false;
-      for (let k = i + 1; k < pattern.length; k++) {
+      // TODO: can cache the location of right bracket, but honestly array dereference might be slower than naive searching each time, given the small size of the pattern
+      let k;
+      for (k = i + 1; k < pattern.length; k++) {
         if (pattern[k] === "]") {
-          group = pattern.slice(i, k + 1);
-          result = matchGroup(input[i], group)
-            ? match(i + 1, k + 1)
-            : match(i + 1, j);
-          closingBracketFound = true;
+          break;
         }
       }
-      if (!closingBracketFound) {
+      if (k === pattern.length) {
         throw new Error("No closing ] found");
+      }
+      group = pattern.slice(i, k + 1);
+      const doesMatch = matchGroup(input[i], group);
+      if (mustMatchStart) {
+        if (doesMatch) {
+          result = match(i + 1, k + 1, true);
+        } else {
+          result = false;
+        }
+      } else {
+        result = doesMatch ? match(i + 1, k + 1) : match(i + 1, j);
       }
     }
 
-    // // TODO: add caching for locating the matching ]
-    // // match a positive or negative character group
-    // else if (pattern[i] === "[") {
-    //   const positive = pattern[i + 1] !== "^";
-    //   let k = positive ? i + 1 : i + 2;
-    //   let matchFound = false;
-    //   for (; k < pattern.length; k++) {
-    //     if (pattern[k] === "]") {
-    //       break;
-    //     }
-    //     if (pattern[k] === input[i]) {
-    //       matchFound = true;
-    //       // no break as we need the bracket index
-    //     }
-    //   }
-    //   if (k === pattern.length) {
-    //     throw new Error("No closing ] found");
-    //   }
-    //   if (matchFound) {
-    //     result = positive ? match(i + 1, k + 1) : match(i + 1, j);
-    //   } else {
-    //     result = positive ? match(i + 1, j) : match(i + 1, k + 1);
-    //   }
-    // }
-
     // match a single char
     else {
-      result = input[i] === pattern[j] ? match(i + 1, j + 1) : match(i + 1, j);
+      console.log(`must match char`);
+      const doesMatch = input[i] === pattern[j];
+      console.log(`char does match: ${doesMatch}`);
+      if (mustMatchStart) {
+        if (doesMatch) {
+          result = match(i + 1, j + 1, true);
+        } else {
+          result = false;
+        }
+      } else {
+        result = doesMatch ? match(i + 1, j + 1) : match(i + 1, j);
+      }
     }
 
     memo[i][j] = result;
@@ -153,7 +116,15 @@ function main() {
     console.log("Expected first argument to be '-E'");
     process.exit(1);
   }
-  if (match(0, 0)) {
+
+  let result;
+  if (pattern[0] === "^") {
+    result = match(0, 1, true);
+  } else {
+    result = match(0, 0, false);
+  }
+
+  if (result) {
     console.log("match found");
     process.exit(0);
   } else {
