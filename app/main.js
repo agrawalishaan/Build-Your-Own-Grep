@@ -1,5 +1,11 @@
 const PATTERN_DIGIT = "\\d";
-const ORDS_DIGIT_STR = [48, 57];
+const PATTERN_ALPHANUMERIC = "\\w";
+
+const ASCII_RANGES = {
+  digitStrings: [48, 57],
+  alphaLower: [97, 122],
+  alphaUpper: [65, 90],
+};
 
 function getCharCode(char) {
   if (char.length !== 1) {
@@ -16,12 +22,32 @@ function matchPattern(inputLine, pattern) {
     for (const char of inputLine) {
       const code = getCharCode(char);
       console.log(`char code: ${code}`);
-      if (code >= ORDS_DIGIT_STR[0] && code <= ORDS_DIGIT_STR[1]) {
+      if (
+        code >= ASCII_RANGES.digitStrings[0] &&
+        code <= ASCII_RANGES.digitStrings[1]
+      ) {
         return true;
       }
     }
     return false;
-  } else if (pattern.length === 1) {
+  } else if (pattern === PATTERN_ALPHANUMERIC) {
+    for (const char of inputLine) {
+      const code = getCharCode(char);
+      if (
+        (code >= ASCII_RANGES.digitStrings[0] &&
+          code <= ASCII_RANGES.digitStrings[1]) ||
+        (code >= ASCII_RANGES.alphaLower[0] &&
+          code <= ASCII_RANGES.alphaLower[1]) ||
+        (code >= ASCII_RANGES.alphaUpper[0] &&
+          code <= ASCII_RANGES.alphaUpper[1])
+      ) {
+        return true;
+      }
+    }
+    return false;
+  }
+  // match a single char
+  else if (pattern.length === 1) {
     console.log(`matching a char ${pattern}`);
     return inputLine.includes(pattern);
   } else {
