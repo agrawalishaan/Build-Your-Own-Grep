@@ -46,6 +46,17 @@ function matchPattern(inputLine, pattern) {
     }
     return false;
   }
+  // match any character inside the brackets
+  else if (pattern[0] == "[" && pattern[pattern.length - 1] == "]") {
+    const inputSet = new Set(inputLine);
+    for (let i = 1; i < pattern.length - 1; i++) {
+      const char = pattern[i];
+      if (inputSet.has(char)) {
+        return true;
+      }
+    }
+    return false;
+  }
   // match a single char
   else if (pattern.length === 1) {
     console.log(`matching a char ${pattern}`);
