@@ -38,6 +38,24 @@ function matchAlphanumeric(char) {
   return false;
 }
 
+function matchGroup(char, group) {
+  const positive = group[1] !== "^";
+  let k = positive ? 1 : 2;
+  const patternChars = new Set();
+  for (; k < group.length - 1; k++) {
+    patternChars.add(group[k]);
+    if (patternChars.has(char)) {
+      if (positive) {
+        return true;
+      }
+    }
+  }
+  if (!positive && !patternChars.has(char)) {
+    return true;
+  }
+  return false;
+}
+
 function main() {
   const input = require("fs").readFileSync(0, "utf-8").trim();
   const pattern = process.argv[3];
@@ -78,38 +96,48 @@ function main() {
         : match(i + 1, j);
     }
 
-    // TODO: add caching for locating the matching ]
-    // match a positive or negative character group
+    // match group
     else if (pattern[i] === "[") {
-      const positive = pattern[i + 1] !== "^";
-      let k = positive ? i + 1 : i + 2;
-      let matchFound = false;
-      console.log(`positive: ${positive}`);
-      console.log(`k: ${k}`);
-      for (; k < pattern.length; k++) {
+      // find group
+      let closingBracketFound = false;
+      for (let k = i + 1; k < pattern.length; k++) {
         if (pattern[k] === "]") {
-          break;
-        }
-        if (pattern[k] === input[i]) {
-          console.log(`match found!`);
-          matchFound = true;
-          // no break as we need the bracket index
+          group = pattern.slice(i, k + 1);
+          result = matchGroup(input[i], group)
+            ? match(i + 1, k + 1)
+            : match(i + 1, j);
+          closingBracketFound = true;
         }
       }
-      if (k === pattern.length) {
+      if (!closingBracketFound) {
         throw new Error("No closing ] found");
       }
-      if (matchFound) {
-        console.log(
-          `entering the match found subproblem since we were positive, i: ${
-            i + 1
-          }, j: ${k + 1}`
-        );
-        result = positive ? match(i + 1, k + 1) : match(i + 1, j);
-      } else {
-        result = positive ? match(i + 1, j) : match(i + 1, k + 1);
-      }
     }
+
+    // // TODO: add caching for locating the matching ]
+    // // match a positive or negative character group
+    // else if (pattern[i] === "[") {
+    //   const positive = pattern[i + 1] !== "^";
+    //   let k = positive ? i + 1 : i + 2;
+    //   let matchFound = false;
+    //   for (; k < pattern.length; k++) {
+    //     if (pattern[k] === "]") {
+    //       break;
+    //     }
+    //     if (pattern[k] === input[i]) {
+    //       matchFound = true;
+    //       // no break as we need the bracket index
+    //     }
+    //   }
+    //   if (k === pattern.length) {
+    //     throw new Error("No closing ] found");
+    //   }
+    //   if (matchFound) {
+    //     result = positive ? match(i + 1, k + 1) : match(i + 1, j);
+    //   } else {
+    //     result = positive ? match(i + 1, j) : match(i + 1, k + 1);
+    //   }
+    // }
 
     // match a single char
     else {
