@@ -68,31 +68,49 @@ function matchWildCard(char) {
 function matchAndFindGroup(char, pattern) {
   console.log(`must match group`);
   // find closing ]
-  let l;
-  for (l = 0; l < pattern.length; l++) {
-    if (pattern[l] === "]") {
+  let i;
+  for (i = 0; i < pattern.length; i++) {
+    if (pattern[i] === constants.PATTERN_GROUP_CLOSE) {
       break;
     }
   }
-  if (l === pattern.length) {
-    throw new Error("No closing ] found");
+  if (i === pattern.length) {
+    throw new Error(`No closing ${constants.PATTERN_GROUP_CLOSE} found`);
   }
 
-  const positive = pattern[1] !== "^";
-  let k = positive ? 1 : 2;
+  const positive = pattern[1] !== constants.PATTERN_ANCHOR_FRONT;
+  let j = positive ? 1 : 2;
   const patternChars = new Set();
-  for (; k < l; k++) {
-    patternChars.add(pattern[k]);
+  for (; j < i; j++) {
+    patternChars.add(pattern[j]);
     if (patternChars.has(char)) {
       if (positive) {
-        return [true, l + 1];
+        return [true, i + 1];
       }
     }
   }
   if (!positive && !patternChars.has(char)) {
-    return [true, l + 1];
+    return [true, i + 1];
   }
   return [false, 0];
+}
+
+// takes abc|def|ghi) for the pattern
+function findOr(pattern) {
+  console.log(`finding or for pattern: ${pattern}`);
+  // find the )
+  let i;
+  for (i = 0; i < pattern.length; i++) {
+    if (pattern[i] === constants.PATTERN_OR_CLOSE) {
+      break;
+    }
+  }
+  if (i === pattern.length) {
+    throw new Error(`No closing ${constants.PATTERN_OR_CLOSE} found`);
+  }
+  const options = pattern.slice(0, i).split(constants.PATTERN_OR);
+  console.log(`options are: ${options}`);
+  return [options, i + 1];
 }
 
 module.exports = {
@@ -103,4 +121,5 @@ module.exports = {
   matchOneOrMore,
   matchZeroOrMore,
   matchWildCard,
+  findOr,
 };

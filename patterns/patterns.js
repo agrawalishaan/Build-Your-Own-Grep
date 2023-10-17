@@ -6,6 +6,7 @@ const {
   matchOneOrMore,
   matchZeroOrMore,
   matchWildCard,
+  findOr,
 } = require("../match/matchIndividual");
 
 const patternsInputOnly = {
@@ -23,10 +24,14 @@ const patternsRepeat = {
 const patternsNoRepeat = {
   [constants.PATTERN_ZERO_OR_MORE]: matchZeroOrMore,
 };
+const patternsOr = {
+  [constants.PATTERN_OR_OPEN]: findOr,
+};
 
 module.exports = {
   patternsInputOnly,
   patternsInputAndPattern,
   patternsRepeat,
   patternsNoRepeat,
+  patternsOr,
 };
