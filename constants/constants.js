@@ -1,6 +1,7 @@
 const PATTERN_DIGIT = "\\d";
 const PATTERN_ALPHANUMERIC = "\\w";
 const PATTERN_GROUP = "[";
+const PATTERN_REPEAT = "+";
 
 const ALPHANUMERIC_RANGES = {
   digitStrings: [48, 57],
@@ -13,5 +14,6 @@ module.exports = {
   PATTERN_DIGIT,
   PATTERN_ALPHANUMERIC,
   PATTERN_GROUP,
+  PATTERN_REPEAT,
   ALPHANUMERIC_RANGES,
 };

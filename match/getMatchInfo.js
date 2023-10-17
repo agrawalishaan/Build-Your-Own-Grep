@@ -1,6 +1,7 @@
 const {
   patternsInputOnly,
   patternsInputAndPattern,
+  patternsRepeat,
 } = require("../patterns/patterns");
 
 // takes an input and pattern, determines which match function to apply, applies it, then returns [inputOffset, patternOffset] based on if it matched or not and the match type
@@ -24,6 +25,17 @@ function getMatchInfo(input, pattern) {
       if (doesMatch) {
         return [1, patternOffset];
       }
+    }
+  }
+
+  for (const patternStr in patternsRepeat) {
+    if (pattern[1] === patternStr) {
+      const matchFunc = patternsRepeat[patternStr];
+      const indices = matchFunc(input, pattern);
+      if (indices.length === 0) {
+        return [1, 0];
+      }
+      return [1, 2];
     }
   }
 

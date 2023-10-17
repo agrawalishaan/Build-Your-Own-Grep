@@ -3,6 +3,7 @@ const {
   matchDigit,
   matchAlphanumeric,
   matchAndFindGroup,
+  matchOneOrMore,
 } = require("../match/matchIndividual");
 
 const patternsInputOnly = {
@@ -13,5 +14,8 @@ const patternsInputOnly = {
 const patternsInputAndPattern = {
   [constants.PATTERN_GROUP]: matchAndFindGroup,
 };
+const patternsRepeat = {
+  [constants.PATTERN_REPEAT]: matchOneOrMore,
+};
 
-module.exports = { patternsInputOnly, patternsInputAndPattern };
+module.exports = { patternsInputOnly, patternsInputAndPattern, patternsRepeat };

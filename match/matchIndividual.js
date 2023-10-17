@@ -28,8 +28,24 @@ function matchAlphanumeric(char) {
   return false;
 }
 
+// TODO: currently doesn't support matching with ^ or $
+// matching one or more is import for the ^ operator, so we return a indices we can go up to in the input
+// takes a+ as pattern
+function matchOneOrMore(input, pattern) {
+  const repeatChar = pattern[0];
+  console.log(`must match one or more`);
+  const indices = [];
+  for (let i = 0; i < input.length; i++) {
+    if (input[i] !== repeatChar) {
+      break;
+    }
+    indices.push(i);
+  }
+  return indices;
+}
+
 // TODO: can make more efficient by capturing the pattern in a closure and not recreating the group each time, though closures have their own overhead
-// this function is aware of non group parts of the pattern as well, so the logic for locating a group is encapsulated
+// this function is aware of non group parts of the pattern as well, so the logic for locating a group is encapsulated, takes abcd] for the pattern
 function matchAndFindGroup(char, pattern) {
   console.log(`must match group`);
   // find closing ]
@@ -65,4 +81,5 @@ module.exports = {
   matchDigit,
   matchAlphanumeric,
   matchAndFindGroup,
+  matchOneOrMore,
 };
