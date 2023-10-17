@@ -41,7 +41,21 @@ function matchOneOrMore(input, pattern) {
     }
     indices.push(i);
   }
-  return indices;
+  return indices.length > 0 ? true : false;
+}
+
+// TODO: currently doesn't support matching with ^ or $
+function matchZeroOrMore(input, pattern) {
+  const repeatChar = pattern[0];
+  console.log(`must match zero or more`);
+  const indices = [];
+  for (let i = 0; i < input.length; i++) {
+    if (input[i] !== repeatChar) {
+      break;
+    }
+    indices.push(i);
+  }
+  return true; // will change once we support ^
 }
 
 // TODO: can make more efficient by capturing the pattern in a closure and not recreating the group each time, though closures have their own overhead
@@ -82,4 +96,5 @@ module.exports = {
   matchAlphanumeric,
   matchAndFindGroup,
   matchOneOrMore,
+  matchZeroOrMore,
 };

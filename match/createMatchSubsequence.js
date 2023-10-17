@@ -10,10 +10,12 @@ function createMatchSubsequence(input, pattern) {
     console.log(`match called with i=${i}, j=${j}`);
     // base cases, no pattern left to match
     if (j === pattern.length) {
+      console.log("pattern length reached, ret true");
       return true;
     }
     // base case, no valid input left
     if (i === input.length) {
+      console.log("input length reached, ret false");
       return false;
     }
 
