@@ -1,6 +1,7 @@
 const createMatchSubsequence = require("../match/createMatchSubsequence");
 const matchStart = require("../match/matchStart");
 const matchEnd = require("../match/matchEnd");
+const constants = require("../constants/constants");
 
 function main() {
   const input = require("fs").readFileSync(0, "utf-8").trim();
@@ -15,20 +16,28 @@ function main() {
   }
 
   let result;
-  if (pattern[0] !== "^" && pattern[pattern.length - 1] !== "$") {
+  if (
+    pattern[0] !== constants.PATTERN_ANCHOR_FRONT &&
+    pattern[pattern.length - 1] !== constants.PATTERN_ANCHOR_BACK
+  ) {
     const matchSubsequence = createMatchSubsequence(input, pattern);
     result = matchSubsequence(0, 0);
   } else {
     let patternSubstring = pattern;
-    if (pattern[0] === "^") {
+    if (pattern[0] === constants.PATTERN_ANCHOR_FRONT) {
       patternSubstring = patternSubstring.slice(1);
     }
-    if (patternSubstring[patternSubstring.length - 1] === "$") {
+    if (
+      patternSubstring[patternSubstring.length - 1] ===
+      constants.PATTERN_ANCHOR_BACK
+    ) {
       patternSubstring = patternSubstring.slice(0, -1);
     }
     result =
-      (pattern[0] === "^" ? matchStart(input, patternSubstring) : true) &&
-      (pattern[pattern.length - 1] === "$"
+      (pattern[0] === constants.PATTERN_ANCHOR_FRONT
+        ? matchStart(input, patternSubstring)
+        : true) &&
+      (pattern[pattern.length - 1] === constants.PATTERN_ANCHOR_BACK
         ? matchEnd(input, patternSubstring)
         : true);
   }
