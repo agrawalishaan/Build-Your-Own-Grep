@@ -5,11 +5,13 @@ const {
   matchAndFindGroup,
   matchOneOrMore,
   matchZeroOrMore,
+  matchWildCard,
 } = require("../match/matchIndividual");
 
 const patternsInputOnly = {
   [constants.PATTERN_DIGIT]: matchDigit,
   [constants.PATTERN_ALPHANUMERIC]: matchAlphanumeric,
+  [constants.PATTERN_WILDCARD]: matchWildCard,
 };
 
 const patternsInputAndPattern = {

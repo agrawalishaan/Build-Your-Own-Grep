@@ -58,6 +58,11 @@ function matchZeroOrMore(input, pattern) {
   return true; // will change once we support ^
 }
 
+function matchWildCard(char) {
+  console.log(`must match wildcard`);
+  return true;
+}
+
 // TODO: can make more efficient by capturing the pattern in a closure and not recreating the group each time, though closures have their own overhead
 // this function is aware of non group parts of the pattern as well, so the logic for locating a group is encapsulated, takes abcd] for the pattern
 function matchAndFindGroup(char, pattern) {
@@ -97,4 +102,5 @@ module.exports = {
   matchAndFindGroup,
   matchOneOrMore,
   matchZeroOrMore,
+  matchWildCard,
 };

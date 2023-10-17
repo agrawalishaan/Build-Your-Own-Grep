@@ -3,6 +3,7 @@ const PATTERN_ALPHANUMERIC = "\\w";
 const PATTERN_GROUP = "[";
 const PATTERN_REPEAT = "+";
 const PATTERN_ZERO_OR_MORE = "?";
+const PATTERN_WILDCARD = ".";
 
 const ALPHANUMERIC_RANGES = {
   digitStrings: [48, 57],
@@ -16,6 +17,7 @@ module.exports = {
   PATTERN_ALPHANUMERIC,
   PATTERN_GROUP,
   PATTERN_REPEAT,
+  PATTERN_WILDCARD,
   PATTERN_ZERO_OR_MORE,
   ALPHANUMERIC_RANGES,
 };
